@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "Alex Friedman",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "typescript": "^2.4.1"
   },
   "repository": {
