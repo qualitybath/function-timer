@@ -1,0 +1,20 @@
+{
+  "name": "@qb/function-timer",
+  "version": "0.0.1",
+  "description": "Typescript based utility to clock how long a function took to execute.",
+  "main": "build/type-time.js",
+  "types": "build/type-time.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "Alex Friedman",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^2.4.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qualitybath/function-timer"
+  }
+}
