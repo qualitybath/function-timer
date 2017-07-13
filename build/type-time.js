@@ -82,6 +82,7 @@ class TypeTime {
     reset() {
         this._map.clear();
         this._times = [];
+        this._zeroTime = new Date();
     }
 }
 exports.TypeTime = TypeTime;
