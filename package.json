@@ -5,7 +5,8 @@
   "main": "build/type-time.js",
   "types": "build/type-time.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "tsc"
   },
   "keywords": [],
   "author": "Alex Friedman",
