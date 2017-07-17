@@ -42,12 +42,14 @@ class TypeTime {
         if (!startTime) {
             return;
         }
-        this._times.push({
+        const timeSpent = {
             name,
             startTime,
             endTime,
             difference: endTime.getTime() - startTime.getTime()
-        });
+        };
+        this._times.push(timeSpent);
+        return timeSpent;
     }
     timeSync(fn, name) {
         return ((...args) => {

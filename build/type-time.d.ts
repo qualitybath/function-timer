@@ -1,3 +1,9 @@
+export declare type TimeSpent = Readonly<{
+    name: string;
+    startTime: Date;
+    endTime: Date;
+    difference: number;
+}>;
 export declare class TypeTime {
     private _map;
     private _times;
@@ -13,7 +19,7 @@ export declare class TypeTime {
     }[];
     readonly totalTime: number;
     time(name: string): void;
-    timeEnd(name: string): void;
+    timeEnd(name: string): TimeSpent | undefined;
     timeSync<FN extends Function>(fn: FN, name: string): FN;
     timePromise<T, FN extends (...args: any[]) => Promise<T | undefined | null>>(fn: FN, name: string): FN;
     timeCallback(fn: (...args: any[]) => any, name: string): (...args: any[]) => any;
