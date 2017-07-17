@@ -1,6 +1,6 @@
 {
   "name": "@qb/function-timer",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Typescript based utility to clock how long a function took to execute.",
   "main": "build/type-time.js",
   "types": "build/type-time.d.ts",

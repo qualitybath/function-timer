@@ -1,4 +1,4 @@
-type TimeSpent = Readonly<{
+export type TimeSpent = Readonly<{
   name: string;
   startTime: Date;
   endTime: Date;
@@ -46,18 +46,21 @@ export class TypeTime {
     this._map.set(name, startTime);
   }
 
-  timeEnd(name: string) {
+  timeEnd(name: string) : TimeSpent | undefined {
     const endTime = new Date();
     const startTime = this._map.get(name);
     if (!startTime) {
       return;
     }
-    this._times.push({
+    const timeSpent = {
       name,
       startTime,
       endTime,
       difference: endTime.getTime() - startTime.getTime()
-    });
+    };
+
+    this._times.push(timeSpent);
+    return timeSpent;
   }
 
   timeSync<FN extends Function>(fn: FN, name: string): FN {
