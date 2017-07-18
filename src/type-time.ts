@@ -1,9 +1,9 @@
-export type TimeSpent = Readonly<{
+export type TimeSpent = {
   name: string;
   startTime: Date;
   endTime: Date;
   difference: number;
-}>
+}
 
 type IdentifierFormatter = (name: string, ...args: any[]) => string;
 
@@ -12,55 +12,62 @@ const buildIdentifier: IdentifierFormatter = (name: string, ...args: any[]): str
 }
 
 export class TypeTime {
-  private _map = new Map<string, Date>();
-  private _times: Array<TimeSpent> = [];
+  private _map = new Map<string, TimeSpent>();
   private _formatter: IdentifierFormatter;
   private _zeroTime: Date = new Date();
+  
+  static DEFAULT_DATE = new Date(0,0,0);
 
   constructor(formatter = buildIdentifier) {
     this._formatter = formatter;
   }
 
   get times() {
-    if (!this._times.length) {
+    if (!this._map.size) {
       return [];
     }
-    const sorted = [...this._times].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
-    return sorted.map(t => ({
+    const values = [...this._map.values()];
+    return values.map(t => ({
       ...t,
       delay: t.startTime.getTime() - this._zeroTime.getTime()
     }));
   }
 
   get totalTime() {
-    if(!this._times.length) {
+    if (!this._map.size) {
       return 0;
     }
 
-    const latestEndTime = [...this._times].sort((a,b) => b.endTime.getTime() - a.endTime.getTime())[0].endTime;
+    const values = [...this._map.values()];
+    const latestEndTime = values.sort((a,b) => b.endTime.getTime() - a.endTime.getTime())[0].endTime;
     return latestEndTime.getTime() - this._zeroTime.getTime();
   }
 
   time(name: string): void {
     const startTime = new Date();
-    this._map.set(name, startTime);
+    this._map.set(name, {
+      startTime,
+      name,
+      difference: 0, //default value
+      endTime: TypeTime.DEFAULT_DATE //default value
+    });
   }
 
   timeEnd(name: string) : TimeSpent | undefined {
     const endTime = new Date();
-    const startTime = this._map.get(name);
-    if (!startTime) {
+    const timeSpent = this._map.get(name);
+    if (!timeSpent) {
       return;
     }
-    const timeSpent = {
-      name,
-      startTime,
-      endTime,
-      difference: endTime.getTime() - startTime.getTime()
-    };
 
-    this._times.push(timeSpent);
-    return timeSpent;
+    const result: TimeSpent = {
+      name: timeSpent.name!,
+      startTime: timeSpent.startTime!,
+      endTime,
+      difference: endTime.getTime() - timeSpent.startTime!.getTime()
+    }
+    this._map.set(name, result);
+    return result;
   }
 
   timeSync<FN extends Function>(fn: FN, name: string): FN {
@@ -98,7 +105,6 @@ export class TypeTime {
 
   reset() {
     this._map.clear();
-    this._times = [];
     this._zeroTime = new Date();
   }
 }

@@ -1,14 +1,14 @@
-export declare type TimeSpent = Readonly<{
+export declare type TimeSpent = {
     name: string;
     startTime: Date;
     endTime: Date;
     difference: number;
-}>;
+};
 export declare class TypeTime {
     private _map;
-    private _times;
     private _formatter;
     private _zeroTime;
+    static DEFAULT_DATE: Date;
     constructor(formatter?: (name: string, ...args: any[]) => string);
     readonly times: {
         delay: number;
