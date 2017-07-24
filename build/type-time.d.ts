@@ -4,6 +4,10 @@ export declare type TimeSpent = {
     endTime: Date;
     difference: number;
 };
+export declare type TimeToken = {
+    token: string;
+    identifier: string;
+};
 export declare class TypeTime {
     private _map;
     private _formatter;
@@ -18,8 +22,8 @@ export declare class TypeTime {
         difference: number;
     }[];
     readonly totalTime: number;
-    time(name: string): void;
-    timeEnd(name: string): TimeSpent | undefined;
+    time(name: string): TimeToken;
+    timeEnd(token: TimeToken): TimeSpent | undefined;
     timeSync<FN extends Function>(fn: FN, name: string): FN;
     timePromise<T, FN extends (...args: any[]) => Promise<T | undefined | null>>(fn: FN, name: string): FN;
     timeCallback(fn: (...args: any[]) => any, name: string): (...args: any[]) => any;

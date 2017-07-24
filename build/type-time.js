@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const uuid = require("uuid");
 const buildIdentifier = (name, ...args) => {
     return `${name}(${args.join(', ')})`;
 };
@@ -34,16 +35,21 @@ class TypeTime {
     }
     time(name) {
         const startTime = new Date();
-        this._map.set(name, {
+        const token = {
+            token: uuid.v4(),
+            identifier: name
+        };
+        this._map.set(token, {
             startTime,
             name,
             difference: 0,
             endTime: TypeTime.DEFAULT_DATE //default value
         });
+        return token;
     }
-    timeEnd(name) {
+    timeEnd(token) {
         const endTime = new Date();
-        const timeSpent = this._map.get(name);
+        const timeSpent = this._map.get(token);
         if (!timeSpent) {
             return;
         }
@@ -53,24 +59,24 @@ class TypeTime {
             endTime,
             difference: endTime.getTime() - timeSpent.startTime.getTime()
         };
-        this._map.set(name, result);
+        this._map.set(token, result);
         return result;
     }
     timeSync(fn, name) {
         return ((...args) => {
             const identifier = this._formatter(name, ...args);
-            this.time(identifier);
+            const token = this.time(identifier);
             const result = fn(...args);
-            this.timeEnd(identifier);
+            this.timeEnd(token);
             return result;
         });
     }
     timePromise(fn, name) {
         return ((...args) => __awaiter(this, void 0, void 0, function* () {
             const identifier = this._formatter(name, ...args);
-            this.time(identifier);
+            const token = this.time(identifier);
             const result = yield fn(...args);
-            this.timeEnd(identifier);
+            this.timeEnd(token);
             return result;
         }));
     }
@@ -79,9 +85,9 @@ class TypeTime {
             const rest = [...args];
             const callback = rest.pop();
             const identifier = this._formatter(name, ...rest);
-            this.time(identifier);
+            const token = this.time(identifier);
             fn(...rest, (...argsCb) => {
-                this.timeEnd(identifier);
+                this.timeEnd(token);
                 callback(...argsCb);
             });
         };

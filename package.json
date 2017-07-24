@@ -1,6 +1,6 @@
 {
   "name": "@qb/function-timer",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Typescript based utility to clock how long a function took to execute.",
   "main": "build/type-time.js",
   "types": "build/type-time.d.ts",
@@ -17,5 +17,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/qualitybath/function-timer"
+  },
+  "dependencies": {
+    "@types/uuid": "^3.4.0",
+    "uuid": "^3.1.0"
   }
 }

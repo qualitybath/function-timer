@@ -1,8 +1,15 @@
+import * as uuid from 'uuid';
+
 export type TimeSpent = {
   name: string;
   startTime: Date;
   endTime: Date;
   difference: number;
+}
+
+export type TimeToken = {
+  token: string;
+  identifier: string;
 }
 
 type IdentifierFormatter = (name: string, ...args: any[]) => string;
@@ -12,7 +19,7 @@ const buildIdentifier: IdentifierFormatter = (name: string, ...args: any[]): str
 }
 
 export class TypeTime {
-  private _map = new Map<string, TimeSpent>();
+  private _map = new Map<TimeToken, TimeSpent>();
   private _formatter: IdentifierFormatter;
   private _zeroTime: Date = new Date();
   
@@ -43,19 +50,26 @@ export class TypeTime {
     return latestEndTime.getTime() - this._zeroTime.getTime();
   }
 
-  time(name: string): void {
+  time(name: string): TimeToken {
     const startTime = new Date();
-    this._map.set(name, {
+    const token = {
+      token: uuid.v4() ,
+      identifier: name
+
+    }
+    this._map.set(token, {
       startTime,
       name,
       difference: 0, //default value
       endTime: TypeTime.DEFAULT_DATE //default value
     });
+
+    return token;
   }
 
-  timeEnd(name: string) : TimeSpent | undefined {
+  timeEnd(token: TimeToken) : TimeSpent | undefined {
     const endTime = new Date();
-    const timeSpent = this._map.get(name);
+    const timeSpent = this._map.get(token);
     if (!timeSpent) {
       return;
     }
@@ -66,16 +80,16 @@ export class TypeTime {
       endTime,
       difference: endTime.getTime() - timeSpent.startTime!.getTime()
     }
-    this._map.set(name, result);
+    this._map.set(token, result);
     return result;
   }
 
   timeSync<FN extends Function>(fn: FN, name: string): FN {
     return ((...args: any[]) => {
       const identifier = this._formatter(name, ...args);
-      this.time(identifier);
+      const token = this.time(identifier);
       const result = fn(...args);
-      this.timeEnd(identifier);
+      this.timeEnd(token);
       return result;
     }) as any as FN;
   }
@@ -83,9 +97,9 @@ export class TypeTime {
   timePromise<T, FN extends (...args: any[]) => Promise<T | undefined | null>>(fn: FN, name: string): FN {
     return (async (...args: any[]) => {
       const identifier = this._formatter(name, ...args);
-      this.time(identifier);
+      const token = this.time(identifier);
       const result = await fn(...args);
-      this.timeEnd(identifier);
+      this.timeEnd(token);
       return result;
     }) as any as FN;
   }
@@ -95,9 +109,9 @@ export class TypeTime {
       const rest = [...args];
       const callback: any = rest.pop();
       const identifier = this._formatter(name, ...rest);
-      this.time(identifier);
+      const token = this.time(identifier);
       fn(...rest, (...argsCb: any[]) => {
-        this.timeEnd(identifier);
+        this.timeEnd(token);
         callback(...argsCb);
       });
     }
