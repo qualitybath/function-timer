@@ -22,11 +22,13 @@ export class TypeTime {
   private _map = new Map<TimeToken, TimeSpent>();
   private _formatter: IdentifierFormatter;
   private _zeroTime: Date = new Date();
-  
-  static DEFAULT_DATE = new Date(0,0,0);
+  private _enabled: boolean;
 
-  constructor(formatter = buildIdentifier) {
+  static DEFAULT_DATE = new Date(0, 0, 0);
+
+  constructor({ formatter = buildIdentifier, enabled = true } = {}) {
     this._formatter = formatter;
+    this._enabled = enabled;
   }
 
   get times() {
@@ -46,16 +48,19 @@ export class TypeTime {
     }
 
     const values = [...this._map.values()];
-    const latestEndTime = values.sort((a,b) => b.endTime.getTime() - a.endTime.getTime())[0].endTime;
+    const latestEndTime = values.sort((a, b) => b.endTime.getTime() - a.endTime.getTime())[0].endTime;
     return latestEndTime.getTime() - this._zeroTime.getTime();
   }
 
   time(name: string): TimeToken {
     const startTime = new Date();
     const token = {
-      token: uuid.v4() ,
+      token: uuid.v4(),
       identifier: name
 
+    }
+    if (!this._enabled) {
+      return token;
     }
     this._map.set(token, {
       startTime,
@@ -67,7 +72,10 @@ export class TypeTime {
     return token;
   }
 
-  timeEnd(token: TimeToken) : TimeSpent | undefined {
+  timeEnd(token: TimeToken): TimeSpent | undefined {
+    if (!this._enabled) {
+      return;
+    }
     const endTime = new Date();
     const timeSpent = this._map.get(token);
     if (!timeSpent) {
@@ -115,6 +123,14 @@ export class TypeTime {
         callback(...argsCb);
       });
     }
+  }
+
+  enable() {
+    this._enabled = true;
+  }
+
+  disable() {
+    this._enabled = false;
   }
 
   reset() {

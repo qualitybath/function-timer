@@ -13,10 +13,11 @@ const buildIdentifier = (name, ...args) => {
     return `${name}(${args.join(', ')})`;
 };
 class TypeTime {
-    constructor(formatter = buildIdentifier) {
+    constructor({ formatter = buildIdentifier, enabled = true } = {}) {
         this._map = new Map();
         this._zeroTime = new Date();
         this._formatter = formatter;
+        this._enabled = enabled;
     }
     get times() {
         if (!this._map.size) {
@@ -39,6 +40,9 @@ class TypeTime {
             token: uuid.v4(),
             identifier: name
         };
+        if (!this._enabled) {
+            return token;
+        }
         this._map.set(token, {
             startTime,
             name,
@@ -48,6 +52,9 @@ class TypeTime {
         return token;
     }
     timeEnd(token) {
+        if (!this._enabled) {
+            return;
+        }
         const endTime = new Date();
         const timeSpent = this._map.get(token);
         if (!timeSpent) {
@@ -91,6 +98,12 @@ class TypeTime {
                 callback(...argsCb);
             });
         };
+    }
+    enable() {
+        this._enabled = true;
+    }
+    disable() {
+        this._enabled = false;
     }
     reset() {
         this._map.clear();

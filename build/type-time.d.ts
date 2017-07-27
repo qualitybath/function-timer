@@ -12,8 +12,12 @@ export declare class TypeTime {
     private _map;
     private _formatter;
     private _zeroTime;
+    private _enabled;
     static DEFAULT_DATE: Date;
-    constructor(formatter?: (name: string, ...args: any[]) => string);
+    constructor({formatter, enabled}?: {
+        formatter?: (name: string, ...args: any[]) => string;
+        enabled?: boolean;
+    });
     readonly times: {
         delay: number;
         name: string;
@@ -27,5 +31,7 @@ export declare class TypeTime {
     timeSync<FN extends Function>(fn: FN, name: string): FN;
     timePromise<T, FN extends (...args: any[]) => Promise<T | undefined | null>>(fn: FN, name: string): FN;
     timeCallback(fn: (...args: any[]) => any, name: string): (...args: any[]) => any;
+    enable(): void;
+    disable(): void;
     reset(): void;
 }
